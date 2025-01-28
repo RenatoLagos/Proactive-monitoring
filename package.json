@@ -1,0 +1,19 @@
+{
+  "name": "proactive_monitoring",
+  "version": "1.0.0",
+  "description": "REST API's with Express & Typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RenatoLagos/Proactive_monitoring.git"
+  },
+  "author": "Renato Lagos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RenatoLagos/Proactive_monitoring/issues"
+  },
+  "homepage": "https://github.com/RenatoLagos/Proactive_monitoring#readme"
+}
