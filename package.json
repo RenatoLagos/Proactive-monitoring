@@ -4,7 +4,7 @@
   "description": "REST API's with Express & Typescript",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --exec ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/RenatoLagos/Proactive_monitoring/issues"
   },
-  "homepage": "https://github.com/RenatoLagos/Proactive_monitoring#readme"
+  "homepage": "https://github.com/RenatoLagos/Proactive_monitoring#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
 }
