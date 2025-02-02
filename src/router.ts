@@ -1,25 +1,24 @@
-import { Router } from "express";
+import { Router } from "express"
+import { createRobots } from "./handlers/robots"
 
-const router = Router();
+const router = Router()
 
 router.get("/", (req, res) => {
-  res.json("From Get");
-});
+  res.json("From Get")
+})
 
-router.post("/", (req, res) => {
-    res.json("From Post");
-});
+router.post("/", createRobots)
 
 router.put("/", (req, res) => {
-    res.json("From put");
-});
+    res.json("From put")
+})
 
 router.patch("/", (req, res) => {
-    res.json("From Patch");
-});
+    res.json("From Patch")
+})
 
 router.delete("/", (req, res) => {
-    res.json("From Delete");
-});
+    res.json("From Delete")
+})
 
-export default router;
+export default router
