@@ -8,13 +8,13 @@ class Robots extends Model {
     @Column({
         type: DataType.STRING(50)
     })
-    name: string
+    declare name: string
 
     @Default(true)
     @Column({
         type: DataType.BOOLEAN()
     })
-    status: boolean
+    declare status: boolean
 }
 
 export default Robots
