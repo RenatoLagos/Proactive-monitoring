@@ -1,7 +1,5 @@
-import {sum} from './server'
+import server from "./server";
 
-console.log('Hello, world!')
-
-sum()
-
-console.log('Hello, world!')
+server.listen(4000, () => {
+    console.log("Server is running on http://localhost:3000");
+});
