@@ -5,6 +5,7 @@ import { handlerInputErrors } from "./middleware/index"
 
 
 const router = Router()
+
 /**
  * @swagger
  * components:
@@ -50,14 +51,74 @@ const router = Router()
  * 
  * 
  */
- 
+
 router.get("/", getRobots)
+
+/**
+ * @swagger
+ * /api/robots/{id}:
+ *      get:
+ *         summary: Get a robot by id
+ *         tags: 
+ *              - Robots
+ *         description: Returns a robot by id
+ *         parameters:
+ *              - in: path
+ *                name: id
+ *                schema:
+ *                  type: integer
+ *                required: true
+ *                description: The id of the robot
+ *         responses:
+ *             200:
+ *                description: Successful response
+ *                content:
+ *                   application/json:
+ *                      schema:
+ *                         $ref: '#/components/schemas/Robot'
+ *             404:
+ *                description: Robot not found
+ *             400:
+ *                description: Bad request
+ */
 
 router.get("/:id",
     param('id', 'Id not valid').isInt(),
     handlerInputErrors, 
     getRobotById
 )
+
+/**
+ * @swagger
+ * /api/robots:
+ *      post:
+ *          summary: Create a new robot
+ *          tags:
+ *              - Robots
+ *          description: Create a new robot
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  example: "R2D2"
+ *                              status:
+ *                                  type: boolean
+ *                                  example: true
+ *          responses:
+ *              201:
+ *                  description: Robot created successfully
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              $ref: '#/components/schemas/Robot'
+ *              400:
+ *                  description: Bad request
+ */
 
 router.post("/", 
     body('name', 'Name is required').notEmpty(),
@@ -66,6 +127,46 @@ router.post("/",
     createRobots
 )
 
+/**
+ * @swagger
+ * /api/robots/{id}:
+ *      put:
+ *          summary: Update a robot
+ *          tags:
+ *              - Robots
+ *          description: Update a robot
+ *          parameters:
+ *              - in: path
+ *                name: id
+ *                schema:
+ *                  type: integer
+ *                required: true
+ *                description: The id of the robot
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              name:
+ *                                  type: string
+ *                                  example: "R2D2"
+ *                              status:
+ *                                  type: boolean
+ *                                  example: true
+ *          responses:
+ *              200:
+ *                  description: Robot updated successfully
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              $ref: '#/components/schemas/Robot'
+ *              400:
+ *                  description: Bad request
+ *              404:
+ *                  description: Robot not found
+ */
 router.put("/:id", 
     param('id', 'Id not valid').isInt(),
     body('name', 'Name is required').notEmpty().isString(),
@@ -74,11 +175,68 @@ router.put("/:id",
     updateRobot
 )
 
+/**
+ * @swagger
+ * /api/robots/{id}:
+ *      patch:
+ *          summary: Update a robot status
+ *          tags:
+ *              - Robots
+ *          description: Update a robot status
+ *          parameters:
+ *              - in: path
+ *                name: id
+ *                schema:
+ *                  type: integer
+ *                required: true
+ *                description: The id of the robot
+ *          responses:
+ *              200:
+ *                  description: Robot updated successfully
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              $ref: '#/components/schemas/Robot'
+ *              400:
+ *                  description: Bad request
+ *              404:
+ *                  description: Robot not found
+ */
+
 router.patch("/:id",
     param('id', 'Id not valid').isInt(),
     handlerInputErrors, 
     updateRobotStatus
 )
+
+/**
+ * @swagger
+ * /api/robots/{id}:
+ *      delete:
+ *          summary: Delete a robot
+ *          tags:
+ *              - Robots
+ *          description: Delete a robot
+ *          parameters:
+ *              - in: path
+ *                name: id
+ *                schema:
+ *                  type: integer
+ *                required: true
+ *                description: The id of the robot
+ *          responses:
+ *              200:
+ *                  description: Robot deleted successfully
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              type: string
+ *                              value: "Robot deleted"
+ *              400:
+ *                  description: Bad request
+ *              404:
+ *                  description: Robot not found
+ */
 
 router.delete("/:id",
     param('id', 'Id not valid').isInt(),

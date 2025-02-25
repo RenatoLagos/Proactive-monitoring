@@ -1,4 +1,5 @@
 import swaggerJSDoc from "swagger-jsdoc"
+import { SwaggerUiOptions } from "swagger-ui-express"
 
 
 const options : swaggerJSDoc.Options = {
@@ -20,7 +21,21 @@ const options : swaggerJSDoc.Options = {
 }
 
 const swaggerSpec = swaggerJSDoc(options)
+
+const swaggerUiOptions : SwaggerUiOptions = {
+    customCss: `
+        .topbar-wrapper .link {
+            content: url('https://interactivechaos.com/sites/default/files/2023-02/super_mario.png');
+            height: 200px;
+            width: auto;
+      }
+    `,
+    customSiteTitle: "Robots API",
+    customfavIcon: "https://interactivechaos.com/sites/default/files/2023-02/super_mario.png"
+}
+
 export default swaggerSpec
+export { swaggerUiOptions }
 
  
     
