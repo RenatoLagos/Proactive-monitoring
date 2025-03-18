@@ -1,10 +1,18 @@
-import { Table, Column, Model, DataType, Default } from 'sequelize-typescript'
+import { Table, Column, Model, DataType, Default, PrimaryKey, AutoIncrement } from 'sequelize-typescript'
 
 @Table({
-    tableName: 'robots'
+    tableName: 'robots',
+    timestamps: true
 })
 
 class Robots extends Model {
+    @PrimaryKey
+    @AutoIncrement
+    @Column({
+        type: DataType.INTEGER
+    })
+    declare id: number
+
     @Column({
         type: DataType.STRING(50)
     })
@@ -12,9 +20,25 @@ class Robots extends Model {
 
     @Default(true)
     @Column({
-        type: DataType.BOOLEAN()
+        type: DataType.BOOLEAN
     })
     declare status: boolean
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true
+    })
+    declare test?: string
+
+    @Column({
+        type: DataType.DATE
+    })
+    declare createdAt: Date
+
+    @Column({
+        type: DataType.DATE
+    })
+    declare updatedAt: Date
 }
 
 export default Robots

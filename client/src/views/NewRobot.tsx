@@ -1,11 +1,9 @@
-import { Link, Form } from 'react-router-dom'
-
-export async function action() {
-    console.log('NewRobot action')
-    return {}    
-}
+import { Link, Form, useActionData } from 'react-router-dom'
+import ErrorMessage from '../components/ErrorMessage'
 
 export default function NewRobot() {
+    const error = useActionData() as string
+    
     return (
         <>
             <div className='flex justify-between items-center'>
@@ -18,30 +16,21 @@ export default function NewRobot() {
                 </Link>
             </div>
 
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+
             <Form 
                 className='mt-8'
                 method='POST'
-                action='action'
             >
                 <div className='flex flex-col mb-4'>
                     <label htmlFor='name' className='text-slate-500'>Name</label>
                     <input 
                         type='text' 
                         id='name' 
-                        name='name' 
+                        name='name'
+                        placeholder='Robot Name' 
                         className='border border-slate-500 rounded-md px-4 py-2'
                     />
-                </div>
-                <div className='flex flex-col mb-4'>
-                    <label htmlFor='type' className='text-slate-500'>Status</label>
-                    <select 
-                        id='status' 
-                        name='status' 
-                        className='border border-slate-500 rounded-md px-4 py-2'
-                    >
-                        <option value='active'>Active</option>
-                        <option value='inactive'>Inactive</option>
-                    </select>
                 </div>
                 <button
                     type='submit'
