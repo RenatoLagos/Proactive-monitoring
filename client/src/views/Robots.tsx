@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom'
+import RobotDetails from '../components/RobotDetails'
+import { Robot } from '../types'
 
 export default function Robots() {
+    const robots = useLoaderData() as Robot[]
     return (
         <>
             <div className='flex justify-between items-center'>
@@ -12,6 +15,22 @@ export default function Robots() {
                     Add Robot
                 </Link>
             </div>
-        </> 
+            <table className='w-full mt-5 table-auto'>
+                <thead>
+                    <tr>
+                        <th className='px-4 py-2'>Name</th>
+                        <th className='px-4 py-2'>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {robots.map(robot => (
+                        <RobotDetails 
+                            key={robot.id}
+                            robot={robot}
+                        />
+                    ))}
+                </tbody>
+            </table>
+        </>
     )
 }

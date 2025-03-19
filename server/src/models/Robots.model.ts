@@ -8,9 +8,7 @@ import { Table, Column, Model, DataType, Default, PrimaryKey, AutoIncrement } fr
 class Robots extends Model {
     @PrimaryKey
     @AutoIncrement
-    @Column({
-        type: DataType.INTEGER
-    })
+    @Column(DataType.INTEGER)
     declare id: number
 
     @Column({
@@ -23,12 +21,6 @@ class Robots extends Model {
         type: DataType.BOOLEAN
     })
     declare status: boolean
-
-    @Column({
-        type: DataType.STRING,
-        allowNull: true
-    })
-    declare test?: string
 
     @Column({
         type: DataType.DATE
