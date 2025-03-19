@@ -89,3 +89,67 @@ export async function getRobotById(id: Robot['id']) {
         throw error
     }
 }
+
+export async function updateRobot(data: RobotData, id: Robot['id']) {
+    try {
+        const result = safeParse(RobotSchema, {
+            id,
+            name: data.name,
+            status: data.status === 'active' ? true : false
+        })
+        if (result.success) {
+            const url = `${import.meta.env.VITE_API_URL}/api/robots/${id}`
+            const response = await axios.put(url, result.output)
+            return response.data
+        } else {
+            console.error('Validation error:', result.issues)
+            throw new Error("Invalid data")
+        }
+    } catch (error) {
+        console.error('Error in updateRobot:', error)
+        if (axios.isAxiosError(error)) {
+            console.error('Axios error details:', {
+                message: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            })
+        }
+        throw error
+    }   
+}
+
+export async function deleteRobot(id: Robot['id']) {
+    try {
+        const url = `${import.meta.env.VITE_API_URL}/api/robots/${id}`
+        const response = await axios.delete(url)
+        return response.data
+    } catch (error) {
+        console.error('Error in deleteRobot:', error)
+        if (axios.isAxiosError(error)) {
+            console.error('Axios error details:', {
+                message: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            })
+        }
+        throw error
+    }
+}   
+
+export async function updateStatus(id: Robot['id']) {
+    try {
+        const url = `${import.meta.env.VITE_API_URL}/api/robots/${id}`
+        const response = await axios.patch(url)
+        return response.data
+    } catch (error) {
+        console.error('Error in updateStatus:', error)
+        if (axios.isAxiosError(error)) {
+            console.error('Axios error details:', {
+                message: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            })
+        }
+        throw error
+    }
+}

@@ -4,7 +4,13 @@ import Robots from '../models/Robots.model'
 
 // Get all robots
 export const getRobots = async(req: Request, res: Response) => {
-    const robots = await Robots.findAll()
+    const robots = await Robots.findAll(
+        {
+            order: [
+                ['id', 'ASC']
+            ]
+        }
+    )
     res.json({data: robots})
 }
 

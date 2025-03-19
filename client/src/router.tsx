@@ -2,9 +2,9 @@ import { createBrowserRouter } from 'react-router-dom'
 import Layout from './layouts/Layout'
 import Robots from './views/Robots'
 import NewRobot from './views/NewRobot'
-import { action as newRobotAction} from './actions'
 import EditRobot from './views/EditRobot'
 import { robotsLoader, editRobotLoader } from './loaders/robotLoaders'
+import { newRobotAction, editRobotAction, deleteRobotAction, updateRobotStatus } from './actions/robotActions'
 
 export const router = createBrowserRouter([	
     {
@@ -14,7 +14,8 @@ export const router = createBrowserRouter([
             {   
                 index: true,
                 element: <Robots />,
-                loader: robotsLoader
+                loader: robotsLoader,
+                action: updateRobotStatus
             },
             {
                 path: 'robots/new',
@@ -24,7 +25,12 @@ export const router = createBrowserRouter([
             {
                 path: 'robots/:id/edit',
                 element: <EditRobot />,
-                loader: editRobotLoader
+                loader: editRobotLoader,
+                action: editRobotAction
+            },
+            {
+                path: 'robots/:id/delete',
+                action: deleteRobotAction
             }
         ]
     }

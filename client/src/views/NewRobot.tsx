@@ -1,5 +1,6 @@
 import { Link, Form, useActionData } from 'react-router-dom'
 import ErrorMessage from '../components/ErrorMessage'
+import RobotForm from '../components/RobotForm'
 
 export default function NewRobot() {
     const error = useActionData() as string
@@ -22,16 +23,7 @@ export default function NewRobot() {
                 className='mt-8'
                 method='POST'
             >
-                <div className='flex flex-col mb-4'>
-                    <label htmlFor='name' className='text-slate-500'>Name</label>
-                    <input 
-                        type='text' 
-                        id='name' 
-                        name='name'
-                        placeholder='Robot Name' 
-                        className='border border-slate-500 rounded-md px-4 py-2'
-                    />
-                </div>
+                <RobotForm />
                 <button
                     type='submit'
                     className='bg-slate-500 text-white px-4 py-2 rounded-md hover:bg-slate-600'

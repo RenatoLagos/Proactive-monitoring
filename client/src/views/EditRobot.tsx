@@ -1,6 +1,12 @@
-import { Link, Form, useActionData, useLoaderData} from 'react-router-dom'
+import { Link, Form, useActionData, useLoaderData } from 'react-router-dom'
 import ErrorMessage from '../components/ErrorMessage'
 import { Robot } from '../types'
+import RobotForm from '../components/RobotForm'
+
+const statusOptions = [
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
+]
 
 export default function EditRobot() {
     const robot = useLoaderData() as Robot
@@ -23,16 +29,21 @@ export default function EditRobot() {
                 className='mt-8'
                 method='POST'
             >
+                <RobotForm 
+                    robot={robot}
+                />
                 <div className='flex flex-col mb-4'>
-                    <label htmlFor='name' className='text-slate-500'>Name</label>
-                    <input 
-                        type='text' 
-                        id='name' 
-                        name='name'
-                        placeholder='Robot Name'
-                        defaultValue={robot.name}
+                    <label htmlFor='status' className='text-slate-500'>Status</label>
+                    <select 
+                        id='status' 
+                        name='status'
+                        defaultValue={robot.status ? 'active' : 'inactive' }
                         className='border border-slate-500 rounded-md px-4 py-2'
-                    />
+                    >
+                        {statusOptions.map((option) => (
+                            <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                    </select>
                 </div>
                 <button
                     type='submit'
