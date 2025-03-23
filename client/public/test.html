@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Test</title>
+  <script>
+    async function fetchRobots() {
+      try {
+        const response = await fetch('http://localhost:3002/api/robots');
+        const data = await response.json();
+        document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+        console.log('API Response:', data);
+      } catch (error) {
+        document.getElementById('result').textContent = 'Error: ' + error.message;
+        console.error('Error fetching robots:', error);
+      }
+    }
+
+    async function testApiConnection() {
+      try {
+        const response = await fetch('http://localhost:3002/api/test');
+        const data = await response.json();
+        document.getElementById('test-result').textContent = JSON.stringify(data, null, 2);
+        console.log('Test API Response:', data);
+      } catch (error) {
+        document.getElementById('test-result').textContent = 'Error: ' + error.message;
+        console.error('Error testing API connection:', error);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>API Test</h1>
+  <div>
+    <h2>Test API Connection</h2>
+    <button onclick="testApiConnection()">Test API</button>
+    <pre id="test-result">Click the button to test API connection</pre>
+  </div>
+  <div>
+    <h2>Fetch Robots</h2>
+    <button onclick="fetchRobots()">Fetch Robots</button>
+    <pre id="result">Click the button to fetch robots</pre>
+  </div>
+</body>
+</html>

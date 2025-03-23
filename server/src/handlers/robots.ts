@@ -1,93 +1,162 @@
-import { Request, Response } from 'express'
-import Robots from '../models/Robots.model'
-
+import { Request, Response, NextFunction, RequestHandler } from 'express'
+import Robots, { AlertType } from '../models/Robots.model'
 
 // Get all robots
-export const getRobots = async(req: Request, res: Response) => {
-    const robots = await Robots.findAll(
-        {
-            order: [
-                ['id', 'ASC']
-            ]
+export const getRobots: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const robots = await Robots.findAll({
+            order: [['id', 'ASC']]
+        })
+        
+        if (!robots) {
+            res.status(404).json({
+                success: false,
+                message: "No robots found"
+            })
+            return
         }
-    )
-    res.json({data: robots})
+
+        res.status(200).json({
+            success: true,
+            data: robots
+        })
+    } catch (error) {
+        next(error)
+    }
 }
 
 // Get a single robot
-export const getRobotById = async(req: Request, res: Response) => {
+export const getRobotById: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const robot = await Robots.findByPk(req.params.id)
 
         if(!robot) {
-            res.status(404).json({message: "Robot not found"})
+            res.status(404).json({
+                success: false,
+                message: "Robot not found"
+            })
+            return
         }
 
-        res.json({data: robot})
-
+        res.status(200).json({
+            success: true,
+            data: robot
+        })
     } catch (error){
-        console.log(error)
+        next(error)
     }
 }
 
 // Create a new robot
-export const createRobots = async(req: Request, res: Response) => {
-    const robot = await Robots.create(req.body)
-    res.status(201).json({data: robot})
-}
-
-// Update a robot
-export const updateRobot = async(req: Request, res: Response) => {
+export const createRobots: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const robot = await Robots.findByPk(req.params.id)
-
-        if(!robot) {
-            res.status(404).json({message: "Robot not found"})
-        }
-
-        await robot.update(req.body)
-        await robot.save()
-
-        res.json({data: robot})
-
-    } catch (error){
-        console.log(error)
+        const robot = await Robots.create(req.body)
+        res.status(201).json({
+            success: true,
+            data: robot
+        })
+    } catch (error) {
+        next(error)
     }
 }
 
-// Update status of a robot
-export const updateRobotStatus = async(req: Request, res: Response) => {
+// Update a robot
+export const updateRobot: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const robot = await Robots.findByPk(req.params.id)
 
         if(!robot) {
-            res.status(404).json({message: "Robot not found"})
+            res.status(404).json({
+                success: false,
+                message: "Robot not found"
+            })
+            return
         }
 
-        robot.status = !robot.dataValues.status
-        await robot.save()
+        await robot.update(req.body)
+        res.status(200).json({
+            success: true,
+            data: robot
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 
-        res.json({data: robot})
+// Update robot status
+export const updateRobotStatus: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const robot = await Robots.findByPk(req.params.id)
 
-    } catch (error){
-        console.log(error)
+        if(!robot) {
+            res.status(404).json({
+                success: false,
+                message: "Robot not found"
+            })
+            return
+        }
+
+        await robot.update({ status: !robot.status })
+        res.status(200).json({
+            success: true,
+            data: robot
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+// Update robot alert
+export const updateRobotAlert: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const robot = await Robots.findByPk(req.params.id)
+
+        if(!robot) {
+            res.status(404).json({
+                success: false,
+                message: "Robot not found"
+            })
+            return
+        }
+
+        const { alert } = req.body
+        if (alert !== null && !['System exception', 'Scheduled start failure', 'Runtime Exceeded', 'Terminated'].includes(alert)) {
+            res.status(400).json({
+                success: false,
+                message: "Invalid alert type"
+            })
+            return
+        }
+
+        await robot.update({ alert })
+        res.status(200).json({
+            success: true,
+            data: robot
+        })
+    } catch (error) {
+        next(error)
     }
 }
 
 // Delete a robot
-export const deleteRobot = async(req: Request, res: Response) => {
+export const deleteRobot: RequestHandler = async(req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const robot = await Robots.findByPk(req.params.id)
 
         if(!robot) {
-            res.status(404).json({message: "Robot not found"})
+            res.status(404).json({
+                success: false,
+                message: "Robot not found"
+            })
+            return
         }
 
         await robot.destroy()
-
-        res.json({message: "Robot deleted"})
-
-    } catch (error){
-        console.log(error)
+        res.status(200).json({
+            success: true,
+            message: "Robot deleted successfully"
+        })
+    } catch (error) {
+        next(error)
     }
 }

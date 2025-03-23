@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { body, param } from 'express-validator'
-import { createRobots, getRobots, getRobotById, updateRobot, updateRobotStatus, deleteRobot } from "./handlers/robots"
+import { createRobots, getRobots, getRobotById, updateRobot, updateRobotStatus, updateRobotAlert, deleteRobot } from "./handlers/robots"
 import { handlerInputErrors } from "./middleware/index"
 
 
@@ -25,6 +25,11 @@ const router = Router()
  *                      type: boolean
  *                      description: The status of the robot
  *                      example: true    
+ *                  alert:
+ *                      type: string
+ *                      enum: [null, "System exception", "Scheduled start failure", "Runtime Exceeded", "Terminated"]
+ *                      description: The current alert status of the robot
+ *                      example: null
  * 
  * 
  */
@@ -84,7 +89,7 @@ router.get("/", getRobots)
 
 router.get("/:id",
     param('id', 'Id not valid').isInt(),
-    handlerInputErrors, 
+    handlerInputErrors,
     getRobotById
 )
 
@@ -205,8 +210,60 @@ router.put("/:id",
 
 router.patch("/:id",
     param('id', 'Id not valid').isInt(),
-    handlerInputErrors, 
+    handlerInputErrors,
     updateRobotStatus
+)
+
+/**
+ * @swagger
+ * /api/robots/{id}/alert:
+ *      patch:
+ *          summary: Update a robot alert
+ *          tags:
+ *              - Robots
+ *          description: Update a robot alert
+ *          parameters:
+ *              - in: path
+ *                name: id
+ *                schema:
+ *                  type: integer
+ *                required: true
+ *                description: The id of the robot
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              alert:
+ *                                  type: string
+ *                                  enum: [null, "System exception", "Scheduled start failure", "Runtime Exceeded", "Terminated"]
+ *                                  description: The current alert status of the robot
+ *                                  example: null
+ *          responses:
+ *              200:
+ *                  description: Robot updated successfully
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              $ref: '#/components/schemas/Robot'
+ *              400:
+ *                  description: Bad request
+ *              404:
+ *                  description: Robot not found
+ */
+
+router.patch("/:id/alert",
+    param('id', 'Id not valid').isInt(),
+    body('alert').custom((value: any) => {
+        if (value !== null && !['System exception', 'Scheduled start failure', 'Runtime Exceeded', 'Terminated'].includes(value)) {
+            throw new Error('Invalid alert type')
+        }
+        return true
+    }),
+    handlerInputErrors,
+    updateRobotAlert
 )
 
 /**
@@ -240,7 +297,7 @@ router.patch("/:id",
 
 router.delete("/:id",
     param('id', 'Id not valid').isInt(),
-    handlerInputErrors, 
+    handlerInputErrors,
     deleteRobot
 )
 

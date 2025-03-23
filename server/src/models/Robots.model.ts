@@ -1,34 +1,52 @@
-import { Table, Column, Model, DataType, Default, PrimaryKey, AutoIncrement } from 'sequelize-typescript'
+import { Table, Column, Model, DataType } from 'sequelize-typescript'
+
+export type AlertType = 'System exception' | 'Scheduled start failure' | 'Runtime Exceeded' | 'Terminated' | null
 
 @Table({
     tableName: 'robots',
     timestamps: true
 })
-
-class Robots extends Model {
-    @PrimaryKey
-    @AutoIncrement
-    @Column(DataType.INTEGER)
+export class Robots extends Model {
+    @Column({
+        type: DataType.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    })
     declare id: number
 
     @Column({
-        type: DataType.STRING(50)
+        type: DataType.STRING,
+        allowNull: false
     })
     declare name: string
 
-    @Default(true)
     @Column({
-        type: DataType.BOOLEAN
+        type: DataType.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
     })
     declare status: boolean
 
     @Column({
-        type: DataType.DATE
+        type: DataType.STRING,
+        allowNull: true,
+        validate: {
+            isIn: [[null, 'System exception', 'Scheduled start failure', 'Runtime Exceeded', 'Terminated']]
+        }
+    })
+    declare alert: AlertType
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: false,
+        defaultValue: DataType.NOW
     })
     declare createdAt: Date
 
     @Column({
-        type: DataType.DATE
+        type: DataType.DATE,
+        allowNull: false,
+        defaultValue: DataType.NOW
     })
     declare updatedAt: Date
 }
