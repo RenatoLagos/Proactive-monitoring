@@ -10,6 +10,9 @@ export interface Robot {
   name: string;
   status: boolean;
   alert: AlertType;
+  priority: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface ApiResponse<T> {

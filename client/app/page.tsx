@@ -20,6 +20,8 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<"all" | "true" | "false">("all")
   const [alertFilter, setAlertFilter] = useState<AlertType | "all">("all")
+  const [priorityFilter, setPriorityFilter] = useState<string>("all")
+  const [timeFilter, setTimeFilter] = useState<"all" | "today" | "lastWeek" | "lastMonth">("all")
   const [robots, setRobots] = useState<RobotType[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -43,13 +45,43 @@ export default function Dashboard() {
     fetchRobots()
   }, [])
 
+  // Add functions to check date ranges
+  const isToday = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  }
+
+  const isLastWeek = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const lastWeek = new Date(today);
+    lastWeek.setDate(today.getDate() - 7);
+    return date >= lastWeek && date <= today;
+  }
+
+  const isLastMonth = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const lastMonth = new Date(today);
+    lastMonth.setMonth(today.getMonth() - 1);
+    return date >= lastMonth && date <= today;
+  }
+
   // Filter robots based on search term, status filter, and alert filter
   const filteredRobots = robots.filter((robot) => {
     const matchesSearch = robot.name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === "all" || robot.status.toString() === statusFilter
     const matchesAlert = alertFilter === "all" || robot.alert === alertFilter
+    const matchesPriority = priorityFilter === "all" || robot.priority === priorityFilter
+    const matchesTime = timeFilter === "all" || 
+      (timeFilter === "today" && isToday(robot.createdAt)) ||
+      (timeFilter === "lastWeek" && isLastWeek(robot.createdAt)) ||
+      (timeFilter === "lastMonth" && isLastMonth(robot.createdAt))
 
-    return matchesSearch && matchesStatus && matchesAlert
+    return matchesSearch && matchesStatus && matchesAlert && matchesPriority && matchesTime
   })
 
   // Calculate stats
@@ -67,16 +99,24 @@ export default function Dashboard() {
   }
 
   // Function to render status badge with appropriate color
-  const renderStatusBadge = (status: boolean) => {
+  const renderStatusBadge = (status: boolean, robotId: number) => {
     if (status) {
       return (
-        <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200 flex gap-1 items-center">
+        <Badge 
+          variant="outline" 
+          className="bg-red-100 text-red-800 border-red-200 flex gap-1 items-center cursor-pointer hover:bg-red-200"
+          onClick={() => handleToggleStatus(robotId)}
+        >
           <CheckCircle2 className="h-3 w-3" /> Active
         </Badge>
       )
     } else {
       return (
-        <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 flex gap-1 items-center">
+        <Badge 
+          variant="outline" 
+          className="bg-green-100 text-green-800 border-green-200 flex gap-1 items-center cursor-pointer hover:bg-green-200"
+          onClick={() => handleToggleStatus(robotId)}
+        >
           <AlertCircle className="h-3 w-3" /> Resolved
         </Badge>
       )
@@ -110,14 +150,16 @@ export default function Dashboard() {
     }
   }
 
-  const handleUpdateAlert = async (robotId: number, alert: AlertType) => {
-    try {
-      await robotsApi.updateRobotAlert(robotId, alert)
-      fetchRobots()
-    } catch (error) {
-      console.error("Failed to update robot alert:", error)
-      setError('Failed to update robot alert. Please try again.')
-    }
+  // Add a function to format time span
+  const formatTimeSpan = (dateString: string) => {
+    const now = new Date();
+    const createdAt = new Date(dateString);
+    const diffInSeconds = Math.floor((now.getTime() - createdAt.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
   }
 
   return (
@@ -183,117 +225,190 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>RPA Robots</CardTitle>
-            <CardDescription>Monitor and manage your RPA robots.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search robots..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <Select value={statusFilter} onValueChange={(value: "all" | "true" | "false") => setStatusFilter(value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="true">Active</SelectItem>
-                    <SelectItem value="false">Resolved</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select 
-                  value={alertFilter === null ? "none" : alertFilter} 
-                  onValueChange={(value) => setAlertFilter(value === "none" ? null : value as AlertType)}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filter by alert" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Alerts</SelectItem>
-                    <SelectItem value="System exception">System Exception</SelectItem>
-                    <SelectItem value="Scheduled start failure">Start Failure</SelectItem>
-                    <SelectItem value="Runtime Exceeded">Runtime Exceeded</SelectItem>
-                    <SelectItem value="Terminated">Terminated</SelectItem>
-                    <SelectItem value="none">No Alert</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {error && (
-              <div className="rounded-md bg-red-50 p-4 mb-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <AlertCircle className="h-5 w-5 text-red-400" />
+        <Tabs defaultValue="alerts" className="mt-6">
+          <TabsList>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="robots">Robots</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+          </TabsList>
+          <TabsContent value="alerts" className="space-y-4">
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>RPA Robots</CardTitle>
+                  <CardDescription>Monitor and manage your RPA robots.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row gap-4 mb-4">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search robots..."
+                        className="pl-8"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-muted-foreground" />
+                      <Select value={statusFilter} onValueChange={(value: "all" | "true" | "false") => setStatusFilter(value)}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Statuses</SelectItem>
+                          <SelectItem value="true">Active</SelectItem>
+                          <SelectItem value="false">Resolved</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select 
+                        value={alertFilter === null ? "none" : alertFilter} 
+                        onValueChange={(value) => setAlertFilter(value === "none" ? null : value as AlertType)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by alert" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Alerts</SelectItem>
+                          <SelectItem value="System exception">System Exception</SelectItem>
+                          <SelectItem value="Scheduled start failure">Start Failure</SelectItem>
+                          <SelectItem value="Runtime Exceeded">Runtime Exceeded</SelectItem>
+                          <SelectItem value="Terminated">Terminated</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value)}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Priorities</SelectItem>
+                          <SelectItem value="1 - Critical">Critical</SelectItem>
+                          <SelectItem value="2 - High">High</SelectItem>
+                          <SelectItem value="3 - Moderate">Moderate</SelectItem>
+                          <SelectItem value="4 - Low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={timeFilter} onValueChange={(value) => setTimeFilter(value as typeof timeFilter)}>
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Filter by time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Time</SelectItem>
+                          <SelectItem value="today">Today</SelectItem>
+                          <SelectItem value="lastWeek">Last Week</SelectItem>
+                          <SelectItem value="lastMonth">Last Month</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Robot ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Alert</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8">
-                        Loading robots...
-                      </TableCell>
-                    </TableRow>
-                  ) : filteredRobots.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8">
-                        {searchTerm || statusFilter !== 'all' || alertFilter !== 'all'
-                          ? 'No robots found matching your filters.'
-                          : 'No robots available.'}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredRobots.map((robot) => (
-                      <TableRow key={robot.id}>
-                        <TableCell>RBT-{String(robot.id).padStart(3, '0')}</TableCell>
-                        <TableCell>{robot.name}</TableCell>
-                        <TableCell>{renderStatusBadge(robot.status)}</TableCell>
-                        <TableCell>{renderAlertBadge(robot.alert)}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-24 h-8 text-xs"
-                          >
-                            Create Ticket
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                  {error && (
+                    <div className="rounded-md bg-red-50 p-4 mb-4">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <AlertCircle className="h-5 w-5 text-red-400" />
+                        </div>
+                        <div className="ml-3">
+                          <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                        </div>
+                      </div>
+                    </div>
                   )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Created At</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Priority</TableHead>
+                          <TableHead>Alert</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {loading ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-8">
+                              Loading robots...
+                            </TableCell>
+                          </TableRow>
+                        ) : filteredRobots.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-8">
+                              {searchTerm || statusFilter !== 'all' || alertFilter !== 'all' || priorityFilter !== 'all' || timeFilter !== 'all'
+                                ? 'No robots found matching your filters.'
+                                : 'No robots available.'}
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          filteredRobots.map((robot) => (
+                            <TableRow key={robot.id}>
+                              <TableCell>
+                                <div className="font-medium">
+                                  {formatTimeSpan(robot.createdAt)}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="font-semibold">{robot.name}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  RBT-{String(robot.id).padStart(3, '0')}
+                                </div>
+                              </TableCell>
+                              <TableCell>{robot.priority as '1 - Critical' | '2 - High' | '3 - Moderate' | '4 - Low'}</TableCell>
+                              <TableCell>{renderAlertBadge(robot.alert)}</TableCell>
+                              <TableCell>{renderStatusBadge(robot.status, robot.id)}</TableCell>
+                              <TableCell>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-24 h-8 text-xs"
+                                  >
+                                    Create Ticket
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-24 h-8 text-xs"
+                                  >
+                                    Alert Details
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="robots">
+            <Card>
+              <CardHeader>
+                <CardTitle>Robot Status</CardTitle>
+                <CardDescription>View and manage all your RPA robots.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Robot details will be displayed here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="performance">
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics</CardTitle>
+                <CardDescription>Monitor the performance of your RPA system.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Performance metrics will be displayed here.</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   )

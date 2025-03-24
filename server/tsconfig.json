@@ -3,6 +3,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "lib": ["ESNext"],
+    "types": ["node"],
     /* Basic Options */
     /* Visit https://aka.ms/tsconfig to read more about this file */
 

@@ -37,6 +37,16 @@ export class Robots extends Model {
     declare alert: AlertType
 
     @Column({
+        type: DataType.STRING,
+        allowNull: false,
+        defaultValue: '4 - Low',
+        validate: {
+            isIn: [['1 - Critical', '2 - High', '3 - Moderate', '4 - Low']]
+        }
+    })
+    declare priority: '1 - Critical' | '2 - High' | '3 - Moderate' | '4 - Low'
+
+    @Column({
         type: DataType.DATE,
         allowNull: false,
         defaultValue: DataType.NOW
