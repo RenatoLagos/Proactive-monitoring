@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle2, Filter, RefreshCw, BotIcon as Robot, Search, AlertCircle, AlertTriangle, Clock, XCircle, Ban } from "lucide-react"
+import { CheckCircle2, Filter, RefreshCw, BotIcon as Robot, Search, AlertCircle, AlertTriangle, Clock, XCircle, Ban, BotIcon, Ticket, MoreHorizontal } from "lucide-react"
 import { robotsApi, Robot as RobotType, AlertType } from "@/lib/api"
 import {
   Popover,
@@ -228,14 +228,14 @@ export default function Dashboard() {
         <Tabs defaultValue="alerts" className="mt-6">
           <TabsList>
             <TabsTrigger value="alerts">Alerts</TabsTrigger>
-            <TabsTrigger value="robots">Robots</TabsTrigger>
+            <TabsTrigger value="robots">Inventory</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
           <TabsContent value="alerts" className="space-y-4">
-            <Card className="mt-6">
+            <Card>
               <CardHeader>
-                <CardTitle>RPA Robots</CardTitle>
-                  <CardDescription>Monitor and manage your RPA robots.</CardDescription>
+                <CardTitle>RPA Alerts</CardTitle>
+                  <CardDescription>Monitor and manage your RPA Robots Alerts.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -319,12 +319,42 @@ export default function Dashboard() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Created At</TableHead>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Priority</TableHead>
-                          <TableHead>Alert</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
+                          <TableHead>
+                            <div className="font-semibold flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              Created At
+                            </div>
+                          </TableHead>
+                          <TableHead>
+                            <div className="font-semibold flex items-center gap-2">
+                              <BotIcon className="h-4 w-4" />
+                              Name
+                            </div>
+                          </TableHead>
+                          <TableHead>
+                            <div className="font-semibold flex items-center gap-2">
+                              <AlertTriangle className="h-4 w-4" />
+                              Priority
+                            </div>
+                          </TableHead>
+                            <TableHead>
+                            <div className="font-semibold flex items-center gap-2">
+                              <AlertCircle className="h-4 w-4" />
+                              Alert
+                            </div>
+                          </TableHead>
+                          <TableHead>
+                            <div className="font-semibold flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4" />
+                              Status
+                            </div>
+                          </TableHead>
+                          <TableHead>
+                            <div className="font-semibold flex items-center gap-2">
+                              <MoreHorizontal className="h-4 w-4" />
+                              Actions
+                            </div>
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -373,7 +403,7 @@ export default function Dashboard() {
                                     size="sm"
                                     className="w-24 h-8 text-xs"
                                   >
-                                    Alert Details
+                                    Details
                                   </Button>
                                 </div>
                               </TableCell>
@@ -389,7 +419,7 @@ export default function Dashboard() {
             <TabsContent value="robots">
             <Card>
               <CardHeader>
-                <CardTitle>Robot Status</CardTitle>
+                <CardTitle>Robot Inventory</CardTitle>
                 <CardDescription>View and manage all your RPA robots.</CardDescription>
               </CardHeader>
               <CardContent>
