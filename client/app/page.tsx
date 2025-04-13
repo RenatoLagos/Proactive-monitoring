@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle2, Filter, RefreshCw, BotIcon as Robot, Search, AlertCircle, AlertTriangle, Clock, XCircle, Ban, BotIcon, Ticket, MoreHorizontal } from "lucide-react"
+import { CheckCircle2, Filter, RefreshCw, BotIcon, Search, AlertCircle, AlertTriangle, Clock, XCircle, Ban, Ticket, MoreHorizontal } from "lucide-react"
 import { robotsApi, Robot as RobotType, AlertType } from "@/lib/api"
 import {
   Popover,
@@ -207,7 +207,7 @@ export default function Dashboard() {
       <header className="sticky top-0 z-10 bg-background border-b">
         <div className="container flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
-            <Robot className="h-6 w-6 text-primary" />
+            <BotIcon className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-semibold">RPA Monitoring Dashboard</h1>
           </div>
           <div className="flex items-center gap-2">
