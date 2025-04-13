@@ -15,7 +15,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -28,8 +27,6 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null)
   const [now, setNow] = useState(() => new Date().getTime());
   const [currentTab, setCurrentTab] = useState("alerts")
-  const [mounted, setMounted] = useState(false);
-  const [selectedRobots, setSelectedRobots] = useState<string[]>(['Robot A', 'Robot B', 'Robot C']);
 
   const fetchRobots = async () => {
     try {
@@ -148,20 +145,20 @@ export default function Dashboard() {
       return (
         <Badge 
           variant="outline" 
-          className="bg-red-500 text-white border-red-600 flex gap-1 items-center justify-center cursor-pointer hover:bg-red-600 w-[100px] px-3 whitespace-nowrap"
+          className="bg-red-100 text-red-800 border-red-200 flex gap-1 items-center cursor-pointer hover:bg-red-200"
           onClick={() => handleToggleStatus(robotId)}
         >
-        Active
+          <CheckCircle2 className="h-3 w-3" /> Active
         </Badge>
       )
     } else {
       return (
         <Badge 
           variant="outline" 
-          className="bg-green-500 text-white border-green-600 flex gap-1 items-center justify-center cursor-pointer hover:bg-green-600 w-[100px] px-3 whitespace-nowrap"
+          className="bg-green-100 text-green-800 border-green-200 flex gap-1 items-center cursor-pointer hover:bg-green-200"
           onClick={() => handleToggleStatus(robotId)}
         >
-        Resolved
+          <AlertCircle className="h-3 w-3" /> Resolved
         </Badge>
       )
     }
@@ -173,41 +170,13 @@ export default function Dashboard() {
 
     switch (alert) {
       case 'System exception':
-        return (
-          <Badge 
-            variant="outline" 
-            className="bg-orange-500 text-white border-orange-600 flex gap-1 items-center justify-center w-[150px] px-3 whitespace-nowrap"
-          >
-          System Exception
-          </Badge>
-        )
+        return <span className="text-black">System Exception</span>
       case 'Scheduled start failure':
-        return (
-          <Badge 
-            variant="outline" 
-            className="bg-yellow-500 text-white border-yellow-600 flex gap-1 items-center justify-center w-[150px] px-3 whitespace-nowrap"
-          >
-          Start Failure
-          </Badge>
-        )
+        return <span className="text-black">Start Failure</span>
       case 'Runtime Exceeded':
-        return (
-          <Badge 
-            variant="outline" 
-            className="bg-purple-500 text-white border-purple-600 flex gap-1 items-center justify-center w-[150px] px-3 whitespace-nowrap"
-          >
-          Runtime Exceeded
-          </Badge>
-        )
+        return <span className="text-black">Runtime Exceeded</span>
       case 'Terminated':
-        return (
-          <Badge 
-            variant="outline" 
-            className="bg-red-500 text-white border-red-600 flex gap-1 items-center justify-center w-[150px] px-3 whitespace-nowrap"
-          >
-          Terminated
-          </Badge>
-        )
+        return <span className="text-black">Terminated</span>
     }
   }
 
@@ -231,73 +200,6 @@ export default function Dashboard() {
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
-  }
-
-  // Add effect to handle tab changes
-  useEffect(() => {
-    if (currentTab === "alerts") {
-      // Reset filters for Alerts tab
-      setTimeFilter("today")
-      setStatusFilter("all")
-      setAlertFilter("all")
-      setPriorityFilter("all")
-      // Refresh data
-      fetchRobots()
-    }
-  }, [currentTab])
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Inside your Dashboard component
-  const performanceData = [
-    {
-      time: '00:00',
-      'Robot A': 4,
-      'Robot B': 3,
-      'Robot C': 2,
-    },
-    {
-      time: '04:00',
-      'Robot A': 3,
-      'Robot B': 4,
-      'Robot C': 3,
-    },
-    {
-      time: '08:00',
-      'Robot A': 5,
-      'Robot B': 2,
-      'Robot C': 4,
-    },
-    {
-      time: '12:00',
-      'Robot A': 2,
-      'Robot B': 6,
-      'Robot C': 3,
-    },
-    {
-      time: '16:00',
-      'Robot A': 6,
-      'Robot B': 3,
-      'Robot C': 5,
-    },
-    {
-      time: '20:00',
-      'Robot A': 4,
-      'Robot B': 4,
-      'Robot C': 4,
-    },
-  ];
-
-  if (!mounted) {
-    return (
-      <div className="flex flex-col min-h-screen bg-muted/40">
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -330,7 +232,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium">Total Robots</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats.total}</div>
+              <div className="text-2xl font-bold">{stats.total}</div>
               <p className="text-xs text-muted-foreground">All robots</p>
             </CardContent>
           </Card>
@@ -339,7 +241,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium">Resolved</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">{stats.resolved}</div>
+              <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
               <p className="text-xs text-muted-foreground">Completed tasks</p>
             </CardContent>
           </Card>
@@ -348,7 +250,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium">Active Alerts</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600">{stats.alerts.total}</div>
+              <div className="text-xl sm:text-2xl font-bold text-red-600">{stats.alerts.total}</div>
               <p className="text-xs text-muted-foreground">Issues requiring attention</p>
             </CardContent>
           </Card>
@@ -357,9 +259,7 @@ export default function Dashboard() {
         <Tabs 
           defaultValue="alerts" 
           className="mt-6"
-          onValueChange={(value) => {
-            setCurrentTab(value)
-          }}
+          onValueChange={(value) => setCurrentTab(value)}
         >
           <TabsList>
             <TabsTrigger value="alerts">Alerts</TabsTrigger>
@@ -368,200 +268,180 @@ export default function Dashboard() {
             <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
           <TabsContent value="alerts" className="space-y-4">
-            <Tabs defaultValue="rpa" className="mt-6w-full">
-              <TabsList>
-                <TabsTrigger value="rpa">RPA Alerts</TabsTrigger>
-                <TabsTrigger value="etl">ETL Alerts</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="rpa">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>RPA Alerts</CardTitle>
-                    <CardDescription>
-                      Showing RPA alerts from today
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col md:flex-row gap-4 mb-4">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          type="search"
-                          placeholder="Search robots..."
-                          className="pl-8"
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+            <Card>
+              <CardHeader>
+                <CardTitle>RPA Alerts</CardTitle>
+                <CardDescription>
+                 Showing alerts from today
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-4 mb-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search robots..."
+                      className="pl-8"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={statusFilter} onValueChange={(value: "all" | "true" | "false") => setStatusFilter(value)}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="true">Active</SelectItem>
+                        <SelectItem value="false">Resolved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select 
+                      value={alertFilter === null ? "none" : alertFilter} 
+                      onValueChange={(value) => setAlertFilter(value === "none" ? null : value as AlertType)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by alert" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Alerts</SelectItem>
+                        <SelectItem value="System exception">System Exception</SelectItem>
+                        <SelectItem value="Scheduled start failure">Start Failure</SelectItem>
+                        <SelectItem value="Runtime Exceeded">Runtime Exceeded</SelectItem>
+                        <SelectItem value="Terminated">Terminated</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value)}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Priorities</SelectItem>
+                        <SelectItem value="1 - Critical">Critical</SelectItem>
+                        <SelectItem value="2 - High">High</SelectItem>
+                        <SelectItem value="3 - Moderate">Moderate</SelectItem>
+                        <SelectItem value="4 - Low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="rounded-md bg-red-50 p-4 mb-4">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <AlertCircle className="h-5 w-5 text-red-400" />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Filter className="h-4 w-4 text-muted-foreground" />
-                        <Select value={statusFilter} onValueChange={(value: "all" | "true" | "false") => setStatusFilter(value)}>
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Filter by status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Statuses</SelectItem>
-                            <SelectItem value="true">Active</SelectItem>
-                            <SelectItem value="false">Resolved</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select 
-                          value={alertFilter === null ? "none" : alertFilter} 
-                          onValueChange={(value) => setAlertFilter(value === "none" ? null : value as AlertType)}
-                        >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Filter by alert" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Alerts</SelectItem>
-                            <SelectItem value="System exception">System Exception</SelectItem>
-                            <SelectItem value="Scheduled start failure">Start Failure</SelectItem>
-                            <SelectItem value="Runtime Exceeded">Runtime Exceeded</SelectItem>
-                            <SelectItem value="Terminated">Terminated</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value)}>
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Filter by priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Priorities</SelectItem>
-                            <SelectItem value="1 - Critical">Critical</SelectItem>
-                            <SelectItem value="2 - High">High</SelectItem>
-                            <SelectItem value="3 - Moderate">Moderate</SelectItem>
-                            <SelectItem value="4 - Low">Low</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800">{error}</h3>
                       </div>
                     </div>
+                  </div>
+                )}
 
-                    {error && (
-                      <div className="rounded-md bg-red-50 p-4 mb-4">
-                        <div className="flex">
-                          <div className="flex-shrink-0">
-                            <AlertCircle className="h-5 w-5 text-red-400" />
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>
+                          <div className="font-semibold flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            Created At
                           </div>
-                          <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                        </TableHead>
+                        <TableHead>
+                          <div className="font-semibold flex items-center gap-2">
+                            <BotIcon className="h-4 w-4" />
+                            Name
                           </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>
-                              <div className="font-semibold flex items-center gap-2">
-                                <Clock className="h-4 w-4" />
-                                Created At
+                        </TableHead>
+                        <TableHead>
+                          <div className="font-semibold flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4" />
+                            Priority
+                          </div>
+                        </TableHead>
+                          <TableHead>
+                          <div className="font-semibold flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" />
+                            Alert
+                          </div>
+                        </TableHead>
+                        <TableHead>
+                          <div className="font-semibold flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4" />
+                            Status
+                          </div>
+                        </TableHead>
+                        <TableHead>
+                          <div className="font-semibold flex items-center gap-2">
+                            <MoreHorizontal className="h-4 w-4" />
+                            Actions
+                          </div>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8">
+                            Loading robots...
+                          </TableCell>
+                        </TableRow>
+                      ) : filteredRobots.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-8">
+                            {searchTerm || statusFilter !== 'all' || alertFilter !== 'all' || priorityFilter !== 'all' || timeFilter !== 'all'
+                              ? 'No robots found matching your filters.'
+                              : 'No robots available.'}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        filteredRobots.map((robot) => (
+                          <TableRow key={robot.id}>
+                            <TableCell>
+                              <div className="font-medium">
+                                {formatTimeSpan(robot.createdAt)}
                               </div>
-                            </TableHead>
-                            <TableHead>
-                              <div className="font-semibold flex items-center gap-2">
-                                <BotIcon className="h-4 w-4" />
-                                Name
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-semibold">{robot.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                RBT-{String(robot.id).padStart(3, '0')}
                               </div>
-                            </TableHead>
-                            <TableHead>
-                              <div className="font-semibold flex items-center gap-2">
-                                <AlertTriangle className="h-4 w-4" />
-                                Priority
+                            </TableCell>
+                            <TableCell>{robot.priority as '1 - Critical' | '2 - High' | '3 - Moderate' | '4 - Low'}</TableCell>
+                            <TableCell>{renderAlertBadge(robot.alert)}</TableCell>
+                            <TableCell>{renderStatusBadge(robot.status, robot.id)}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-24 h-8 text-xs"
+                                >
+                                  Create Ticket
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-24 h-8 text-xs"
+                                >
+                                  Details
+                                </Button>
                               </div>
-                            </TableHead>
-                              <TableHead>
-                              <div className="font-semibold flex items-center gap-2">
-                                <AlertCircle className="h-4 w-4" />
-                                Alert
-                              </div>
-                            </TableHead>
-                            <TableHead>
-                              <div className="font-semibold flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4" />
-                                Status
-                              </div>
-                            </TableHead>
-                            <TableHead>
-                              <div className="font-semibold flex items-center gap-2">
-                                <MoreHorizontal className="h-4 w-4" />
-                                Actions
-                              </div>
-                            </TableHead>
+                            </TableCell>
                           </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {loading ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8">
-                                Loading robots...
-                              </TableCell>
-                            </TableRow>
-                          ) : filteredRobots.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8">
-                                {searchTerm || statusFilter !== 'all' || alertFilter !== 'all' || priorityFilter !== 'all' || timeFilter !== 'all'
-                                  ? 'No robots found matching your filters.'
-                                  : 'No robots available.'}
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            filteredRobots.map((robot) => (
-                              <TableRow key={robot.id}>
-                                <TableCell>
-                                  <div className="font-medium">
-                                    {formatTimeSpan(robot.createdAt)}
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                  <div className="font-semibold">{robot.name}</div>
-                                  <div className="text-xs text-muted-foreground">
-                                    RBT-{String(robot.id).padStart(3, '0')}
-                                  </div>
-                                </TableCell>
-                                <TableCell>{robot.priority as '1 - Critical' | '2 - High' | '3 - Moderate' | '4 - Low'}</TableCell>
-                                <TableCell>{renderAlertBadge(robot.alert)}</TableCell>
-                                <TableCell>{renderStatusBadge(robot.status, robot.id)}</TableCell>
-                                <TableCell>
-                                  <div className="flex gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="w-24 h-8 text-xs"
-                                    >
-                                      Create Ticket
-                                    </Button>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="w-24 h-8 text-xs"
-                                    >
-                                      Details
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="etl">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>ETL Alerts</CardTitle>
-                    <CardDescription>
-                      Showing ETL alerts from today
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </TabsContent>
-            </Tabs>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
           <TabsContent value="history" className="space-y-4">
             <Card>
@@ -771,49 +651,10 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Performance Metrics</CardTitle>
-              <CardDescription>Robot activity over time</CardDescription>
+              <CardDescription>Monitor the performance of your RPA system.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={performanceData}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="Robot A" 
-                      stroke="#8884d8" 
-                      strokeWidth={2}
-                      dot={{ strokeWidth: 2 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="Robot B" 
-                      stroke="#82ca9d"
-                      strokeWidth={2}
-                      dot={{ strokeWidth: 2 }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="Robot C" 
-                      stroke="#ffc658"
-                      strokeWidth={2}
-                      dot={{ strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
+              <p className="text-muted-foreground">Performance metrics will be displayed here.</p>
             </CardContent>
           </Card>
         </TabsContent>
