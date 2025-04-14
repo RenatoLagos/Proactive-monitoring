@@ -15,10 +15,10 @@ A proactive monitoring system for RPA processes designed to provide real-time vi
 ## 🖼️ System Screenshots
 
 ### Alert History Panel
-![Alert History](./assets/Screenshot_2025-04-13_214708.webp)
+![Alert History](dashboard-1.webp)
 
 ### Performance Panel
-![Performance and Analytics](./assets/Screenshot_2025-04-13_221937.png)
+![Performance and Analytics](dashboard-2.webp)
 
 ## 🛠️ Tech Stack
 
