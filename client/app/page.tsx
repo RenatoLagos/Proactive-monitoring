@@ -15,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
 export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -202,10 +203,34 @@ export default function Dashboard() {
     return `${Math.floor(diffInSeconds / 86400)}d ago`;
   }
 
+  const getPerformanceData = () => {
+    return robots.map(robot => ({
+      name: robot.name,
+      activeTime: robot.status ? 100 : 0,
+      alerts: robot.alert ? 1 : 0
+    }));
+  };
+
+  const getAlertDistribution = () => {
+    const distribution = {
+      'System exception': stats.alerts.system,
+      'Scheduled start failure': stats.alerts.scheduled,
+      'Runtime Exceeded': stats.alerts.runtime,
+      'Terminated': stats.alerts.terminated
+    };
+    
+    return Object.entries(distribution).map(([name, value]) => ({
+      name,
+      value
+    }));
+  };
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
   return (
     <div className="flex flex-col min-h-screen bg-muted/40">
       <header className="sticky top-0 z-10 bg-background border-b">
-        <div className="container flex items-center justify-between h-16 px-4">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             <BotIcon className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-semibold">RPA Monitoring Dashboard</h1>
@@ -225,7 +250,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="flex-1 container py-6 px-4">
+      <main className="flex-1 mx-auto container py-6 px-4">
         <div className="grid gap-6 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
@@ -647,16 +672,91 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </TabsContent>
-        <TabsContent value="performance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics</CardTitle>
-              <CardDescription>Monitor the performance of your RPA system.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Performance metrics will be displayed here.</p>
-            </CardContent>
-          </Card>
+        <TabsContent value="performance" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Robot Performance</CardTitle>
+                <CardDescription>Active time and alerts by robot</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <BarChart
+                    width={400}
+                    height={300}
+                    data={getPerformanceData()}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="activeTime" fill="#8884d8" name="Active Time" />
+                    <Bar dataKey="alerts" fill="#82ca9d" name="Alerts" />
+                  </BarChart>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Alert Distribution</CardTitle>
+                <CardDescription>Types of alerts distribution</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <PieChart width={400} height={300}>
+                    <Pie
+                      data={getAlertDistribution()}
+                      cx={200}
+                      cy={150}
+                      labelLine={false}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {getAlertDistribution().map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2 lg:col-span-1">
+              <CardHeader>
+                <CardTitle>Activity Trend</CardTitle>
+                <CardDescription>Active robots over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <LineChart
+                    width={400}
+                    height={300}
+                    data={[
+                      { name: 'Mon', active: stats.active },
+                      { name: 'Tue', active: stats.active - 2 },
+                      { name: 'Wed', active: stats.active + 1 },
+                      { name: 'Thu', active: stats.active - 1 },
+                      { name: 'Fri', active: stats.active + 2 },
+                    ]}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="active" stroke="#8884d8" />
+                  </LineChart>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </main>

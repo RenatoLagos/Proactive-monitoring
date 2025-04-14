@@ -3,7 +3,8 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript'
 export type AlertType = 'System exception' | 'Scheduled start failure' | 'Runtime Exceeded' | 'Terminated' | null
 
 @Table({
-    tableName: 'robots',
+    tableName: 'alerts',
+    schema: 'public',
     timestamps: true
 })
 export class Robots extends Model {

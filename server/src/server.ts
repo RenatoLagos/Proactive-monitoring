@@ -13,7 +13,7 @@ import { errorHandler } from './middleware'
 export async function connectDB() {
     try {
         await database.authenticate()
-        database.sync()
+        await database.sync({ force: true })
         console.log(colors.green.bold("Connection to the database has been established successfully."))
     } catch (error) {
         console.error(colors.red.bold("Error connecting to the database: "), error)   
